@@ -33,9 +33,9 @@ persistence:
   existingDataClaim:
   existingBackupsClaim:
   storageClassName: hostpath
-  dataAccessModes: [ "ReadWriteOnce" ]
+  dataAccessModes: ["ReadWriteOnce"]
   dataSize: 10Gi
-  backupsAccessModes: [ "ReadWriteOnce" ]
+  backupsAccessModes: ["ReadWriteOnce"]
   backupsSize: 10Gi
 
 service:
