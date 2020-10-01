@@ -2,6 +2,7 @@ apiVersion: v2
 name: mssql
 description: SQL Server 2019 Linux Helm Chart
 type: application
+home: https://github.com/lethek/charts
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
@@ -12,6 +13,9 @@ version: 0.1.0
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 appVersion: 15.0
+
+sources:
+  - https://github.com/lethek/charts
 
 maintainers:
 - name: Michael Monsour

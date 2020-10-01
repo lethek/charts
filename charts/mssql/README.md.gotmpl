@@ -1,0 +1,27 @@
+{{ template "chart.header" . }}
+{{ template "chart.description" . }}
+
+{{ template "chart.versionLine" . }}
+
+{{ template "chart.homepageLine" . }}
+
+## Installation
+
+### Add Helm repository
+
+```shell
+helm repo add lethek https://lethek.github.io/charts
+helm repo update
+```
+
+## Install MSSQL chart
+
+```bash
+helm install mssql lethek/mssql -f values.yml
+```
+
+## Configuration
+
+The following table lists the configurable parameters of the chart and the default values.
+
+{{ template "chart.valuesSection" . }}
