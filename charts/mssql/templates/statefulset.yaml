@@ -19,7 +19,7 @@ spec:
       labels:
         {{- include "mssql.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.image.pullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -34,40 +34,84 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: mssql
-              containerPort: 1433
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
           livenessProbe:
             tcpSocket:
               port: mssql
-            initialDelaySeconds: 15
-            periodSeconds: 20
+            initialDelaySeconds: {{ .Values.livenessprobe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessprobe.periodSeconds }}
           readinessProbe:
             tcpSocket:
               port: mssql
-            initialDelaySeconds: 5
-            periodSeconds: 10
+            initialDelaySeconds: {{ .Values.readinessprobe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessprobe.initialDelaySeconds }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-          #- name: TZ
-          #  value: Australia/Queensland
-          - name: ACCEPT_EULA
-            value: "Y"
+          - name: TZ
+            value: "{{ .Values.mssql.tz }}"
           - name: SA_PASSWORD
             valueFrom:
               secretKeyRef:
-              {{- if .Values.existingSecret }}
-                name: {{ .Values.existingSecret }}
+              {{- if .Values.mssql.existingSecret }}
+                name: {{ .Values.mssql.existingSecret }}
               {{- else }}
                 name: {{ include "mssql.fullname" . }}-secret
               {{- end }}
-                key: {{ .Values.saPasswordKey }}
+                key: {{ .Values.mssql.saPasswordKey }}
+          - name: ACCEPT_EULA
+            value: "{{ .Values.mssql.acceptEula | upper }}"
+          - name: MSSQL_PID
+            value: "{{ .Values.mssql.edition }}"
+          - name: MSSQL_TCP_PORT
+            value: "{{ .Values.service.port }}"
+          - name: MSSQL_DATA_DIR
+            value: /var/opt/mssql/data
+          - name: MSSQL_BACKUP_DIR
+            value: /var/opt/mssql/backups
+          - name: MSSQL_COLLATION
+            value: "{{ .Values.mssql.collation }}"
+          - name: MSSQL_LCID
+            value: "{{ .Values.mssql.lcid }}"
+          - name: MSSQL_ENABLE_HADR
+            value: "{{ .Values.mssql.hadr }}"
+          - name: MSSQL_AGENT_ENABLED
+            value: {{ .Values.mssql.agent.enabled | quote }}
+          {{ if .Values.resources.limits }}
+          {{ if .Values.resources.limits.memory }}
+          - name: MSSQL_MEMORY_LIMIT_MB
+            valueFrom:
+              resourceFieldRef:
+                resource: limits.memory
+                divisor: 1Mi
+          {{ end }}
+          {{ end }}
 
           volumeMounts:
           - name: data
             mountPath: /var/opt/mssql/data
-          # - name: mssql-backups
-          #   mountPath: /var/opt/mssql/backups
+          - name: backups
+            mountPath: /var/opt/mssql/backups
+
+      volumes:
+        {{- if not .Values.persistence.enabled }}
+        - name: data
+          emptyDir: {}
+        - name: backups
+          emptyDir: {}
+        {{- else }}
+        {{- if .Values.persistence.existingDataClaim }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingDataClaim }}
+        {{- end }}
+        {{- if .Values.persistence.existingBackupsClaim }}
+        - name: backups
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingBackupsClaim }}
+        {{- end }}
+        {{- end }}
 
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -82,38 +126,51 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 
-{{- if .Values.persistentVolume.enabled }}
   volumeClaimTemplates:
+  {{- if and .Values.persistence.enabled (not .Values.persistence.existingDataClaim) }}
   - metadata:
       name: data
       annotations:
-      {{- range $key, $value := .Values.persistentVolume.annotations }}
+      {{- range $key, $value := .Values.persistence.annotations }}
         {{ $key }}: {{ $value }}
       {{- end }}
     spec:
       accessModes:
-      {{- range .Values.persistentVolume.accessModes }}
+      {{- range .Values.persistence.dataAccessModes }}
         - {{ . | quote }}
       {{- end }}
       resources:
         requests:
-          storage: {{ .Values.persistentVolume.size | quote }}
-    {{- if .Values.persistentVolume.storageClass }}
-    {{- if (eq "-" .Values.persistentVolume.storageClass) }}
+          storage: {{ .Values.persistence.dataSize | quote }}
+      {{- if .Values.persistence.storageClass }}
+      {{- if (eq "-" .Values.persistence.storageClass) }}
       storageClassName: ""
-    {{- else }}
-      storageClassName: "{{ .Values.persistentVolume.storageClass }}"
-    {{- end }}
-    {{- end }}
-    {{- if .Values.persistentVolume.reclaimPolicy }}
-    persistentVolumeReclaimPolicy: "{{ .Values.persistentVolume.reclaimPolicy }}"
-    {{- end }}
-{{- else if .Values.hostPath.path }}
-      - name: data
-        hostPath:
-          path: {{ tpl .Values.hostPath.path .}}
-{{- else }}
-      - name: data
-        emptyDir:
-{{ toYaml .Values.emptyDir | indent 10 }}
-{{- end }}
+      {{- else }}
+      storageClassName: "{{ .Values.persistence.storageClass }}"
+      {{- end }}
+      {{- end }}
+  {{- end }}
+
+  {{- if and .Values.persistence.enabled (not .Values.persistence.existingBackupsClaim) }}
+  - metadata:
+      name: backups
+      annotations:
+      {{- range $key, $value := .Values.persistence.annotations }}
+        {{ $key }}: {{ $value }}
+      {{- end }}
+    spec:
+      accessModes:
+      {{- range .Values.persistence.backupsAccessModes }}
+        - {{ . | quote }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.persistence.backupsSize | quote }}
+      {{- if .Values.persistence.storageClass }}
+      {{- if (eq "-" .Values.persistence.storageClass) }}
+      storageClassName: ""
+      {{- else }}
+      storageClassName: "{{ .Values.persistence.storageClass }}"
+      {{- end }}
+      {{- end }}
+  {{- end }}

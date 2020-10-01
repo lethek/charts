@@ -4,33 +4,50 @@
 
 replicaCount: 1
 
-image:
-  repository: mcr.microsoft.com/mssql/server
-  pullPolicy: IfNotPresent
-  tag: 2019-latest
-
-imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-existingSecret: ""
-saPasswordKey: SA_PASSWORD
-saPassword: ""
+image:
+  repository: mcr.microsoft.com/mssql/server
+  tag: 2019-latest
+  pullPolicy: IfNotPresent
+  pullSecrets: []
 
-persistentVolume:
+mssql:
+  edition: Developer
+  collation: SQL_Latin1_General_CP1_CI_AS
+  lcid: 1033
+  hadr: 0
+  tz: Etc/UTC
+  acceptEula: "N"
+
+  existingSecret: ""
+  saPasswordKey: SA_PASSWORD
+  saPassword: ""
+
+  agent:
+    enabled: false
+
+persistence:
   enabled: true
+  existingDataClaim:
+  existingBackupsClaim:
   storageClassName: hostpath
-  accessModes: [ "ReadWriteOnce" ]
-  #persistentVolumeReclaimPolicy: Retain
-  size: 10Gi
+  dataAccessModes: [ "ReadWriteOnce" ]
+  dataSize: 10Gi
+  backupsAccessModes: [ "ReadWriteOnce" ]
+  backupsSize: 10Gi
+
+service:
+  type: ClusterIP
+  port: 1433
+  loadBalancerIP:
+  nodePort:
 
 serviceAccount:
-  # Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # The name of the service account to use. If not set and create is true, a name is generated using the fullname template
   name: ""
 
 podAnnotations: {}
@@ -39,16 +56,6 @@ podSecurityContext:
   fsGroup: 10001
 
 securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
-service:
-  type: ClusterIP
-  port: 1433
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -67,3 +74,11 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+livenessprobe:
+  initialDelaySeconds: 15
+  periodSeconds: 20
+
+readinessprobe:
+  initialDelaySeconds: 5
+  periodSeconds: 10
