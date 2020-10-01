@@ -87,13 +87,11 @@ spec:
                 divisor: 1Mi
           {{ end }}
           {{ end }}
-
           volumeMounts:
           - name: data
             mountPath: /var/opt/mssql/data
           - name: backups
             mountPath: /var/opt/mssql/backups
-
       volumes:
         {{- if not .Values.persistence.enabled }}
         - name: data
@@ -112,7 +110,6 @@ spec:
             claimName: {{ .Values.persistence.existingBackupsClaim }}
         {{- end }}
         {{- end }}
-
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -125,7 +122,6 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-
   volumeClaimTemplates:
   {{- if and .Values.persistence.enabled (not .Values.persistence.existingDataClaim) }}
   - metadata:
@@ -150,7 +146,6 @@ spec:
       {{- end }}
       {{- end }}
   {{- end }}
-
   {{- if and .Values.persistence.enabled (not .Values.persistence.existingBackupsClaim) }}
   - metadata:
       name: backups
