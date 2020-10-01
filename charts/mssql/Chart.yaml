@@ -19,8 +19,8 @@ sources:
   - https://github.com/lethek/charts/tree/master/charts/mssql
 
 maintainers:
-- name: Michael Monsour
-  email: michael@lethek.net
+- name: lethek
+  email: lethek@gmail.com
 
 annotations:
   category: Infrastructure
