@@ -1,0 +1,22 @@
+apiVersion: v1
+entries:
+  mssql:
+  - annotations:
+      category: Infrastructure
+    apiVersion: v2
+    appVersion: "15"
+    created: "2020-10-01T01:09:02.44874637Z"
+    description: SQL Server 2019 Linux Helm Chart
+    digest: da8ea02f4397deedfd35107a00851c2f93aa9fcd5da6ecd10143155795394284
+    home: https://github.com/lethek/charts
+    maintainers:
+    - email: michael@lethek.net
+      name: Michael Monsour
+    name: mssql
+    sources:
+    - https://github.com/lethek/charts
+    type: application
+    urls:
+    - https://github.com/lethek/charts/releases/download/mssql-0.1.0/mssql-0.1.0.tgz
+    version: 0.1.0
+generated: "2020-10-01T01:09:02.255087495Z"
