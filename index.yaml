@@ -5,6 +5,24 @@ entries:
       category: Infrastructure
     apiVersion: v2
     appVersion: "15"
+    created: "2020-10-01T03:00:14.048615593Z"
+    description: SQL Server 2019 Linux Helm Chart
+    digest: 96b0745f634a29902291c95f57b3cd09cc532f038ecec56a237344acaad4ac7a
+    home: https://github.com/lethek/charts
+    maintainers:
+    - email: michael@lethek.net
+      name: Michael Monsour
+    name: mssql
+    sources:
+    - https://github.com/lethek/charts
+    type: application
+    urls:
+    - https://github.com/lethek/charts/releases/download/mssql-0.2.0/mssql-0.2.0.tgz
+    version: 0.2.0
+  - annotations:
+      category: Infrastructure
+    apiVersion: v2
+    appVersion: "15"
     created: "2020-10-01T01:09:02.44874637Z"
     description: SQL Server 2019 Linux Helm Chart
     digest: da8ea02f4397deedfd35107a00851c2f93aa9fcd5da6ecd10143155795394284
