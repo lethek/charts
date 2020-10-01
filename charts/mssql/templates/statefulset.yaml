@@ -60,8 +60,10 @@ spec:
                 name: {{ include "mssql.fullname" . }}-secret
               {{- end }}
                 key: {{ .Values.mssql.saPasswordKey }}
+          {{- if .Values.mssql.acceptEula }}
           - name: ACCEPT_EULA
-            value: "{{ .Values.mssql.acceptEula | upper }}"
+            value: "{{ .Values.mssql.acceptEula }}"
+          {{- end }}
           - name: MSSQL_PID
             value: "{{ .Values.mssql.edition }}"
           - name: MSSQL_TCP_PORT

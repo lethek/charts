@@ -19,7 +19,7 @@ mssql:
   lcid: 1033
   hadr: 0
   tz: Etc/UTC
-  acceptEula: "N"
+  acceptEula:
 
   existingSecret: ""
   saPasswordKey: SA_PASSWORD
