@@ -43,6 +43,7 @@ service:
   port: 1433
   loadBalancerIP:
   nodePort:
+  annotations: {}
 
 serviceAccount:
   create: true
