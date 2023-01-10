@@ -9,7 +9,7 @@ fullnameOverride: ""
 
 image:
   repository: mcr.microsoft.com/mssql/server
-  tag: 2019-latest
+  tag: 2022-latest
   pullPolicy: IfNotPresent
   pullSecrets: []
 

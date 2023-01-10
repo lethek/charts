@@ -51,7 +51,7 @@ spec:
           env:
           - name: TZ
             value: "{{ .Values.mssql.tz }}"
-          - name: SA_PASSWORD
+          - name: MSSQL_SA_PASSWORD
             valueFrom:
               secretKeyRef:
               {{- if .Values.mssql.existingSecret }}
