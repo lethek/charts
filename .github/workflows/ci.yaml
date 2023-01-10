@@ -19,9 +19,6 @@ jobs:
       - name: Install chart-testing (lint)
         uses: helm/chart-testing-action@v2.3.1
 
-      - name: Run helm-docs
-        run: .github/helm-docs.sh
-
       - name: Run chart-testing (list-changed)
         id: list-changed
         run: |
